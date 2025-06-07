@@ -1,0 +1,82 @@
+# 🛠️ Bitácora - June 7, 2025
+## 📍 Project: TERISA Turtlebot Setup
+
+### 👤 Author: Daniel Lázaro  
+### 🕒 Session Start: 09:15 AM  
+### 🌐 Location: Home Lab
+
+---
+
+## 🔧 Objective
+Setup TERISA turtlebot in Home Lab 
+
+---
+
+## 📋 Materials
+- Turtlebot 4 
+    - Distributor ID:	Ubuntu
+    - Description:	Ubuntu 22.04.5 LTS
+    - Release:	22.04
+    - Codename:	jammy
+
+- Laptop with Ubuntu 22.04
+    -Distributor ID:	Ubuntu
+    -Description:	Ubuntu 22.04.5 LTS
+    -Release:	22.04
+    -Codename:	jammy
+- ROS Humble installed in both Turtlebot4 and Laptop. (Turtlebot has everything needed already installed) 
+- micro HDMI to HDMI cable
+- USB wired keyboard
+- HDMI monitor
+
+---
+
+## 🧪 Procedure
+0. Follow https://turtlebot.github.io/turtlebot4-user-manual/overview/
+1. Connect Turtlebot and Monitor via micro HDMI to HDMI cable. ( Ethernet and C-Port acces were tried with no sucess ) 
+2. Connect wired keyboard with Turtlebot.
+3. Boot Turtlebot.
+4. User : Ubuntu
+5. Password : turtlebot4
+6. Turtlebot setup to set network connection. 
+7. * if Turtlebot is being used in a new network it will be better to setup the network in advance thru ssh 
+
+---
+
+## 🧾 Observations
+
+- We are using Simple Discover
+- Fast DDS is the one compatible with ROS Humble
+- If turtlebot is goint to be accessed thru a new computer it will be better to use a new ROS node.
+    export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+    export ROS_DOMAIN_ID=0 --> USE A NEW ROS ID. Currently in home lab node 42 is the one used. 
+
+Also it will important to review fastdds.xml file (nano ~/.ros/fastdds.xml) to update IP address of PC and Turtlebot
+Home lab : 
+        Turtlebot 192.168.100.214
+        PC 192.168.100.250
+
+Test NETWORK communication betwen PC and turtlebot first with 
+
+In Turtlebot: 
+Ping 192.168.100.250
+In PC:
+Ping 192.168.100.214
+
+Test ROS communication betwen PC and turtlebot first with 
+
+In Turtlebot: 
+ros2 run demo_nodes_cpp talker
+In PC:
+ros2 run demo_nodes_cpp listener
+
+## 🧠 Next Steps
+-  Continue with setup and interact with Robot .
+-
+
+
+
+
+
+
+
