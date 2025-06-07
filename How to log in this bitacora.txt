@@ -8,6 +8,4 @@ STEP 7. git add .
 sTEP 8. git commit -m "Added June 7 troubleshooting log" ( comment can be changed ) 
 STEP 9. git push origin main
 
-User : delazaro
-Password : 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                 ( key will last 90 days from today June 6 2025) 
 
