@@ -1,0 +1,13 @@
+STEP 1. Run Jupyter notebook in PC SSH
+STEP 2. Create/change documents or files 
+STEP 3. Control X in SSH where Jupyter notebook was opened. 
+STEP 4. Terminate Jupiter ( write Y) 
+STEP 5. In same SSH make sure to be in ~/Documents/turtlebot4-bitacora/
+STEP 6. git init
+STEP 7. git add .
+sTEP 8. git commit -m "Added June 7 troubleshooting log" ( comment can be changed ) 
+STEP 9. git push origin main
+
+User : delazaro
+Password : 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                 ( key will last 90 days from today June 6 2025) 
+
