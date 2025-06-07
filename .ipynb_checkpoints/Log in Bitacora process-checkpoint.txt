@@ -7,6 +7,3 @@ STEP 6. git init
 STEP 7. git add .
 sTEP 8. git commit -m "Added June 7 troubleshooting log" ( comment can be changed ) 
 STEP 9. git push origin main
-
-User : delazaro                ( saved in text file 
-
