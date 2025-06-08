@@ -51,7 +51,7 @@ Setup TERISA turtlebot in Home Lab
     export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
     export ROS_DOMAIN_ID=0 --> USE A NEW ROS ID. Currently in home lab node 42 is the one used. 
 
-Also it will important to review fastdds.xml file (nano ~/.ros/fastdds.xml) to update IP address of PC and Turtlebot
+Also it will important to review fastdds.xml file (nano ~/.ros/fastdds.xml) to update IP address of PC and Turtlebot **** THIS IS BEING REMOVED with no harm due to parsin errors. 
 Home lab : 
         Turtlebot 192.168.100.214
         PC 192.168.100.250
