@@ -70,6 +70,18 @@ ros2 run demo_nodes_cpp talker
 In PC:
 ros2 run demo_nodes_cpp listener
 
+## 🧾 Manually Deactivate Conda Environment Before ROS 2
+
+If you're already in (base) and just want to leave it for now:
+
+conda deactivate
+
+Then run:
+
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+
+
 ## 🧠 Next Steps
 -  Continue with setup and interact with Robot .
 -
