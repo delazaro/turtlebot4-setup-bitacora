@@ -78,9 +78,16 @@ conda deactivate
 
 Then run:
 
+In Robot ssh : 
+ros2 launch turtlebot4_bringup standard.launch.py
+
+In a PC ssh : rose 
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 
-
+Everything starts workikng when : 
+1. in CReate app ( by accesing http://192.168.100.214:8080 ) also link ROS2 ID domain
+2. Update ROS2 in Robot
+3. Connect Robot and PC to the 5G Wifi
 
 ## 🧠 Next Steps
 -  Continue with setup and interact with Robot .
