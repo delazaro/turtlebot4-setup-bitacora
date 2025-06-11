@@ -90,8 +90,110 @@ Everything starts workikng when :
 3. Connect Robot and PC to the 5G Wifi
 
 ## 🧠 Next Steps
--  Continue with setup and interact with Robot .
+-  Turtlebot manual : Tutorial section : Create 3 actions
+- Create a instruction that is call by a single command. 
 -
+
+This works : 
+
+
+🧱 STEP-BY-STEP GUIDE
+1. 📂 Create a Custom ROS 2 Package
+
+Run this on the robot:
+
+cd ~/turtlebot4_ws/src
+ros2 pkg create --build-type ament_python turtlebot4_custom --dependencies rclpy geometry_msgs
+
+This creates a Python ROS 2 package.
+2. 🐍 Write the Python Node
+
+Create the file:
+
+mkdir -p ~/turtlebot4_ws/src/turtlebot4_custom/turtlebot4_custom
+nano ~/turtlebot4_ws/src/turtlebot4_custom/turtlebot4_custom/action1.py
+
+Paste this content:
+
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+import time
+
+class Action1(Node):
+    def __init__(self):
+        super().__init__('action1_node')
+        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
+        time.sleep(1)
+
+        self.move_forward(1.0, 0.2)   # Move 1m at 0.2 m/s
+        self.rotate(30, 0.3)          # Rotate 30 degrees at 0.3 rad/s
+        self.move_forward(0.5, 0.2)   # Move 0.5m
+
+    def move_forward(self, distance, speed):
+        msg = Twist()
+        msg.linear.x = speed
+        duration = distance / speed
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            self.publisher_.publish(msg)
+            time.sleep(0.1)
+        self.stop()
+
+    def rotate(self, angle_degrees, angular_speed):
+        msg = Twist()
+        msg.angular.z = angular_speed
+        angle_radians = angle_degrees * 3.1416 / 180.0
+        duration = angle_radians / angular_speed
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            self.publisher_.publish(msg)
+            time.sleep(0.1)
+        self.stop()
+
+    def stop(self):
+        self.publisher_.publish(Twist())
+        time.sleep(0.5)
+
+def main(args=None):
+    rclpy.init(args=args)
+    action = Action1()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+
+Save and exit with CTRL+O, Enter, then CTRL+X.
+3. 🧭 Make the Script Executable
+
+Edit setup.py:
+
+nano ~/turtlebot4_ws/src/turtlebot4_custom/setup.py
+
+Add under entry_points:
+
+entry_points={
+    'console_scripts': [
+        'action1 = turtlebot4_custom.action1:main',
+    ],
+},
+
+Then:
+
+chmod +x ~/turtlebot4_ws/src/turtlebot4_custom/turtlebot4_custom/action1.py
+
+4. 🛠️ Build & Source
+
+cd ~/turtlebot4_ws
+colcon build
+source install/setup.bash
+
+Make sure this is also added to your .bashrc if needed.
+5. 🚀 Run the Script!
+
+ros2 run turtlebot4_custom action1
+
+
 
 
 
