@@ -94,6 +94,10 @@ Everything starts workikng when :
 - Create a instruction that is call by a single command. 
 -
 
+
+############################################################################
+CREATE A EXECUTION FILE FOR A MOVE SEQUENCE IN TH ROBOT 
+############################################################################
 This works : 
 
 
@@ -192,6 +196,121 @@ Make sure this is also added to your .bashrc if needed.
 5. 🚀 Run the Script!
 
 ros2 run turtlebot4_custom action1
+
+
+To repeat this I hade to run points chmod step and steps 4 and 5 
+
+
+
+##############################################################################
+CREATE A EXECUTION FILE FOR A MOVE SEQUENCE IN THE ROBOT BUT READING 
+THE INSTRUCTION FROM THE SERVER API.
+############################################################################
+
+This works : 
+
+1. Create the file ServerMonitor : 
+
+
+
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+import time
+import requests
+
+API_URL = "https://main.d1eqaycl2z5gxr.amplifyapp.com/api/v1/commands"
+
+# Action routines
+def call1(publisher):
+    move(publisher, 1.0)
+    rotate(publisher, 20)
+    move(publisher, 2.0)
+
+def call2(publisher):
+    move(publisher, 0.5)
+    rotate(publisher, 45)
+    move(publisher, 1.0)
+
+def call3(publisher):
+    move(publisher, 1.5)
+    rotate(publisher, 90)
+    move(publisher, 0.7)
+
+# Helpers
+def move(publisher, distance_m):
+    twist = Twist()
+    twist.linear.x = 0.2  # m/s
+    duration = distance_m / twist.linear.x
+    start = time.time()
+    while time.time() - start < duration:
+        publisher.publish(twist)
+        time.sleep(0.1)
+    twist.linear.x = 0.0
+    publisher.publish(twist)
+
+def rotate(publisher, angle_deg):
+    twist = Twist()
+    twist.angular.z = 0.5  # rad/s
+    duration = (angle_deg * 3.1416 / 180) / twist.angular.z
+    start = time.time()
+    while time.time() - start < duration:
+        publisher.publish(twist)
+        time.sleep(0.1)
+    twist.angular.z = 0.0
+    publisher.publish(twist)
+
+def fetch_latest_command():
+    try:
+        response = requests.get(API_URL)
+        if response.status_code == 200:
+            commands = response.json().get("data", {}).get("commands", [])
+            if not commands:
+                print("No commands found.")
+                return None
+            latest = max(commands, key=lambda c: c.get("createdAt", ""))
+            return latest["action"]
+        else:
+            print(f"API error: Status code {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"Exception occurred: {e}")
+        return None
+
+def main():
+    rclpy.init()
+    node = Node("command_runner")
+    publisher = node.create_publisher(Twist, "cmd_vel", 10)
+    time.sleep(1)  # Allow publisher to settle
+
+    action = fetch_latest_command()
+    print(f"Latest action: {action}")
+    if action == "call1":
+        call1(publisher)
+    elif action == "call2":
+        call2(publisher)
+    elif action == "call3":
+        call3(publisher)
+    else:
+        print("No valid action found in latest command.")
+
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == "__main__":
+    main()
+
+ 2.    Make it executable (optional):
+
+chmod +x ServerMonitor.py
+
+3.     Run it :
+
+python3 ServerMonitor.py
+
+
+****** Latency responds is hight , around 20-30 seconds 
+
 
 
 
