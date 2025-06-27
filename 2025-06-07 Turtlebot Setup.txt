@@ -430,6 +430,7 @@ ubuntu@ubuntu:~/turtlebot4_ws$ ros2 run turtlebot4_custom server_monitor_latred
 ******* NEXT STEP****** 
 
 Continue testing with better Internet. 
+If it continue having issues it will be better to go to the previous high latency solution and work from there since this option is missing calls 
 
 
 
