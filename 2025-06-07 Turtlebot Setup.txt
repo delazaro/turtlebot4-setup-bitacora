@@ -312,6 +312,126 @@ python3 ServerMonitor.py
 ****** Latency responds is hight , around 20-30 seconds 
 
 
+****** Latency responds is hight , around 20-30 seconds 
+
+This is working and reduce the Latency but is having a error in the middle ***** TODAY internet is not good!!!! Let's try another day. 
+
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+import requests
+import time
+
+API_URL = "https://main.d1eqaycl2z5gxr.amplifyapp.com/api/v1/commands"
+
+class ServerMonitor(Node):
+    def __init__(self):
+        super().__init__('server_monitor')
+        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.last_command_id = None
+        self.timer = self.create_timer(2.0, self.check_for_command)  # every 2 seconds
+        self.get_logger().info("🚀 ServerMonitor node started")
+
+    def check_for_command(self):
+        try:
+            response = requests.get(API_URL, headers={"Cache-Control": "no-cache"}, timeout=5)
+            if response.status_code != 200:
+                self.get_logger().warn(f"API error {response.status_code}")
+                return
+
+            data = response.json().get("data", {}).get("commands", [])
+            if not data:
+                self.get_logger().info("No commands received")
+                return
+
+            latest_command = max(data, key=lambda c: c.get("createdAt", ""))
+            command_id = latest_command.get("id")
+
+            if command_id != self.last_command_id:
+                self.last_command_id = command_id
+                action = latest_command.get("action")
+                self.get_logger().info(f"✅ New command: {action}")
+                self.perform_action(action)
+            else:
+                self.get_logger().debug("No new command")
+
+        except Exception as e:
+            self.get_logger().error(f"Error fetching command: {e}")
+
+    def perform_action(self, action):
+        if action == "call1":
+            self.call1()
+        elif action == "call2":
+            self.call2()
+        elif action == "call3":
+            self.call3()
+        else:
+            self.get_logger().warn(f"⚠️ Unknown action: {action}")
+
+    def move(self, distance_m):
+        twist = Twist()
+        twist.linear.x = 0.2
+        duration = distance_m / twist.linear.x
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            self.publisher_.publish(twist)
+            time.sleep(0.1)
+        self.stop()
+
+    def rotate(self, angle_deg):
+        twist = Twist()
+        twist.angular.z = 0.5
+        duration = (angle_deg * 3.1416 / 180) / twist.angular.z
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            self.publisher_.publish(twist)
+            time.sleep(0.1)
+        self.stop()
+
+    def stop(self):
+        self.publisher_.publish(Twist())
+        time.sleep(0.5)
+
+    def call1(self):
+        self.move(1.0)
+        self.rotate(20)
+        self.move(2.0)
+
+    def call2(self):
+        self.move(0.5)
+        self.rotate(45)
+        self.move(1.0)
+
+    def call3(self):
+        self.move(1.5)
+        self.rotate(90)
+        self.move(0.7)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = ServerMonitor()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == "__main__":
+    main()
+
+
+
+In order to execte it : 
+ubuntu@ubuntu:~/turtlebot4_ws$ ros2 run turtlebot4_custom server_monitor_latred
+
+
+******* NEXT STEP****** 
+
+Continue testing with better Internet. 
+
+
 
 
 
