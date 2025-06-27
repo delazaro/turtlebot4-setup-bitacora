@@ -431,6 +431,7 @@ ubuntu@ubuntu:~/turtlebot4_ws$ ros2 run turtlebot4_custom server_monitor_latred
 
 Continue testing with better Internet. 
 If it continue having issues it will be better to go to the previous high latency solution and work from there since this option is missing calls 
+Try running without calling : ros2 launch turtlebot4_bringup standard.launch.py. It seems that the command works without it. 
 
 
 
