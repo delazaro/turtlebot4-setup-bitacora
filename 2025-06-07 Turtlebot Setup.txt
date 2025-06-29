@@ -312,8 +312,6 @@ python3 ServerMonitor.py
 ****** Latency responds is hight , around 20-30 seconds 
 
 
-****** Latency responds is hight , around 20-30 seconds 
-
 This is working and reduce the Latency but is having a error in the middle ***** TODAY internet is not good!!!! Let's try another day. 
 
 import rclpy
@@ -424,7 +422,7 @@ if __name__ == "__main__":
 
 
 In order to execte it : 
-ubuntu@ubuntu:~/turtlebot4_ws$ ros2 run turtlebot4_custom server_monitor_latred
+ros2 run turtlebot4_custom server_monitor_latred
 
 
 ******* NEXT STEP****** 
