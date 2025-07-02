@@ -452,11 +452,192 @@ After delete the lastest calls and therefore eliminating the trash , everything 
 *************************************************************************
 
 ******* NEXT STEP****** 
-CREATE a map 
+NO MAP To mucho trouble 
+
+
+Let's create this : 1.5 m X 1.5 m layout
+
+
+-------------------------------------
+|     Bedroom    |      Kitchen     | 
+|                | 0,5m             | 
+|                |                  | 
+|                                   | 
+|                                   | 
+|                |                  |  
+|                | 0,5m             | 
+|    Start       |    FrontDoor     | 
+-------------------------------------
 
 
 
 
+The following code works with the layout about with the following calls in the API server . Going to the requested position wait for 10 seconds and then return to the start position. 
+
+gotokitchen
+gotobedroom
+gotofrontdoor
+
+
+
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+API_URL = "https://main.d1eqaycl2z5gxr.amplifyapp.com/api/v1/commands"
+
+def create_session():
+    session = requests.Session()
+    retries = Retry(
+        total=5,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
+session = create_session()
+
+class ServerMonitor(Node):
+    def __init__(self):
+        super().__init__('server_monitor')
+        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.last_command_id = None
+        self.timer = self.create_timer(2.0, self.check_for_command)
+        self.get_logger().info("🚀 ServerMonitor node started")
+
+    def check_for_command(self):
+        command = self.fetch_latest_command()
+        if command:
+            command_id = command.get("id")
+            action = command.get("action")
+            if command_id != self.last_command_id:
+                self.last_command_id = command_id
+                self.get_logger().info(f"✅ New command: {action}")
+                self.perform_action(action)
+            else:
+                self.get_logger().debug("No new command.")
+        else:
+            self.get_logger().warn("⚠️ No valid command fetched.")
+
+    def fetch_latest_command(self):
+        try:
+            response = session.get(API_URL, headers={"Cache-Control": "no-cache"}, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                commands = data.get("data", {}).get("commands", [])
+                if not commands:
+                    return None
+                latest = max(commands, key=lambda c: c.get("createdAt", ""))
+                return latest
+            else:
+                self.get_logger().warn(f"API error: Status {response.status_code}")
+        except Exception as e:
+            self.get_logger().warn(f"Network error: {e}")
+        return None
+
+    def perform_action(self, action):
+        if action == "gotobedroom":
+            self.go_to_bedroom()
+        elif action == "gotokitchen":
+            self.go_to_kitchen()
+        elif action == "gotofrontdoor":
+            self.go_to_frontdoor()
+        else:
+            self.get_logger().warn(f"Unknown action: {action}")
+
+    def move(self, distance_m):
+        twist = Twist()
+        twist.linear.x = 0.2 if distance_m > 0 else -0.2
+        duration = abs(distance_m) / 0.2
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            self.publisher_.publish(twist)
+            time.sleep(0.1)
+        self.stop()
+
+    def rotate(self, angle_deg):
+        twist = Twist()
+        twist.angular.z = 0.5 if angle_deg > 0 else -0.5
+        duration = abs(angle_deg) * 3.1416 / 180 / 0.5
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            self.publisher_.publish(twist)
+            time.sleep(0.1)
+        self.stop()
+
+    def stop(self):
+        self.publisher_.publish(Twist())
+        time.sleep(0.5)
+
+    def go_to_bedroom(self):
+        self.get_logger().info("🛏️ Going to Bedroom")
+        self.move(1.1)
+        self.get_logger().info("🕒 Waiting 10 seconds...")
+        time.sleep(10)
+        self.rotate(180)
+        self.move(1.1)
+        self.rotate(180)
+        self.get_logger().info("🔙 Returned from Bedroom")
+
+    def go_to_kitchen(self):
+        self.get_logger().info("🍳 Going to Kitchen")
+        self.move(0.6)
+        self.rotate(-90)
+        self.move(0.75)
+        self.rotate(90)
+        self.move(0.6)
+        self.get_logger().info("🕒 Waiting 10 seconds...")
+        time.sleep(10)
+        self.rotate(180)
+        self.move(0.6)
+        self.rotate(-90)
+        self.move(0.75)
+        self.rotate(90)
+        self.move(0.6)
+        self.rotate(180)
+        self.get_logger().info("🔙 Returned from Kitchen")
+
+    def go_to_frontdoor(self):
+        self.get_logger().info("🚪 Going to Front Door")
+        self.move(0.6)
+        self.rotate(-90)
+        self.move(0.75)
+        self.rotate(-90)
+        self.move(0.6)
+        self.get_logger().info("🕒 Waiting 10 seconds...")
+        time.sleep(10)
+        self.rotate(180)
+        self.move(0.6)
+        self.rotate(90)
+        self.move(0.75)
+        self.rotate(90)
+        self.move(0.6)
+        self.rotate(180)
+        self.get_logger().info("🔙 Returned from Front Door")
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = ServerMonitor()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == "__main__":
+    main()
+
+
+NEXT Step : Added to the turtlebot everytime it boots 
 
 
 
