@@ -637,7 +637,27 @@ if __name__ == "__main__":
     main()
 
 
-NEXT Step : Added to the turtlebot everytime it boots 
+
+******************************************************************************************
+NEXT Step : Added to the turtlebot everytime it boots > IMPORTANT : It might disable the Turtlebot for other students / applications
+
+So : Everytime we want to run we will need to ssh the turtlebot ( ssh ubuntu@192.168.100.214)  using the Ubuntu computer and runs : 
+(Remember to be in the same 5G WIFI in Turtlebot , Create and PC and also verfify the we are in the same ROS network #42 ( it might happend that need to run in a diferent ROS network) 
+
+ros2 launch turtlebot4_custom server_monitor_launch.py
+or 
+python3 server_monitor_latred_house.py at the file location. 
+
+The files is located at : ~/turtlebot4_ws/src/turtlebot4_custom/turtlebot4_custom/server_monitor_latred_house.py
+
+
+At the beginning It always capture the last command in the API server . If it is gotobedroom , gotokitchen or gotofrontdoor it will be executed and then wait for the next command. 
+
+
+
+
+
+
 
 
 
